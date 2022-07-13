@@ -1,12 +1,21 @@
 # opti_employee
 
-Userscript który finalnie będzie synchronizował osoby na stronie SSPWr z bazą danych w arkuszu Google.
+Narzędzie służące do synchronizacji osób na stronie OptiCMS z bazą danych w arkuszu Google Sheets.
 
 ![](.images/employee_actions.png)
 
+## Konfiguracja
+Do działania wymagane są dwa skrypty:
+- [Google Sheet AppScript](./opti_employee.gs.js)
+- [Userscript](./opti_employee.js)
+
+AppScript należy dodać do odpowiedniego arkusza Google i wykonać wdrożenie przyciskiem.
+
+Userscript zgodnie z instrukcją w ogólnym README.
+
 ## Przykładowe wejście do promptu
 
-Jak na razie skrypt nie synchronizuje się z arkuszem googla, co jest celowym założeniam, dla testu można używać jsona o wyglądzie:
+Dla testu można używać jsona o wyglądzie:
 
 ```json
 [
