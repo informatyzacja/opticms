@@ -1,10 +1,16 @@
 // ==UserScript==
-// @name        _Opticms
+// @name        opti_employee
+// @namespace   Komisja ds. Informatyzacji
+// @description OptiCMS employee list automation
+// @author      Komisja ds. Informatyzacji
+// @version     0.0.8
 // @match       https://samorzad.pwr.edu.pl/panel/employers/*
 // @run-at      document-start
-// @version     0.0.8
 // @grant       GM.getValue
 // @grant       GM.setValue
+// @homepageURL https://github.com/informatyzacja-sspwr-projekty/optibot/tree/main/opti_employee
+// @supportURL  https://github.com/informatyzacja-sspwr-projekty/optibot/issues
+// @downloadURL https://github.com/informatyzacja-sspwr-projekty/optibot/blob/main/opti_employee/opti_employee.js
 // ==/UserScript==
 
 let config = {};
