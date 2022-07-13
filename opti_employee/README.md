@@ -9,7 +9,7 @@ Do działania wymagane są dwa skrypty:
 - [Google Sheet AppScript](./opti_employee.gs.js)
 - [Userscript](./opti_employee.js)
 
-AppScript należy dodać do odpowiedniego arkusza Google i wykonać wdrożenie przyciskiem.
+AppScript należy dodać do odpowiedniego arkusza Google i uruchomić przyciskiem.
 
 Userscript zgodnie z instrukcją w ogólnym README.
 
