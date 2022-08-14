@@ -8,9 +8,9 @@
 // @run-at      document-start
 // @grant       GM.getValue
 // @grant       GM.setValue
-// @homepageURL https://github.com/informatyzacja-sspwr-projekty/optibot/tree/main/opti_employee
-// @supportURL  https://github.com/informatyzacja-sspwr-projekty/optibot/issues
-// @downloadURL https://github.com/informatyzacja-sspwr-projekty/optibot/blob/main/opti_employee/opti_employee.js
+// @homepageURL https://github.com/informatyzacja/opticms/tree/main/automation/userscripts/opti_employee
+// @supportURL  https://github.com/informatyzacja/opticms/issues
+// @downloadURL https://github.com/informatyzacja/opticms/blob/main/automation/userscripts/opti_employee/opti_employee.js
 // ==/UserScript==
 
 let config = {};
