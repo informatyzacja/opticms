@@ -9,7 +9,7 @@ Repozytorium ze wszystkimi instrukcjami obsługi optiCMS wraz z narzędziami do 
 
 ## Automatyzacja
 
-- [Lista userscriptów](./userscripts)
+- [Lista userscriptów](./automation/userscripts)
 
 ## Instrukcje
 
