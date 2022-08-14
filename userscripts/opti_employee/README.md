@@ -1,6 +1,6 @@
 # opti_employee
 
-Narzędzie służące do synchronizacji osób na stronie OptiCMS z bazą danych w arkuszu Google Sheets.
+Narzędzie służące do synchronizacji osób na stronie optiCMS z bazą danych w arkuszu Google Sheets.
 
 ![](.images/employee_actions.png)
 
@@ -11,7 +11,7 @@ Do działania wymagane są dwa skrypty:
 
 AppScript należy dodać do odpowiedniego arkusza Google i uruchomić przyciskiem.
 
-Userscript zgodnie z instrukcją w ogólnym README.
+Userscript zgodnie z instrukcją w ogólnym [README](..).
 
 ## Przykładowe wejście do promptu
 
