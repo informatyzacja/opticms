@@ -6,7 +6,7 @@ Userscripts do automatyzacji zarządzania optiCMS
 
 Instrukcja dla dwóch wtyczek znajduje się poniżej, zasada działania dla pozostałych wtyczek (np. Violentmonkey) pozostaje ta sama.
 
-- [Greasemonkey i Tampermonkey](./instrukcja_instalacji.pdf)
+- [Greasemonkey i Tampermonkey](.docs/installation.pdf)
 
 ## Lista userscriptów
 
