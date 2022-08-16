@@ -3,14 +3,14 @@
 // @namespace   Komisja ds. Informatyzacji
 // @description OptiCMS employee list automation
 // @author      Komisja ds. Informatyzacji
-// @version     0.0.8
+// @version     0.0.9
 // @match       https://samorzad.pwr.edu.pl/panel/employers/*
 // @run-at      document-start
 // @grant       GM.getValue
 // @grant       GM.setValue
 // @homepageURL https://github.com/informatyzacja/opticms/tree/main/automation/userscripts/opti_employee
 // @supportURL  https://github.com/informatyzacja/opticms/issues
-// @downloadURL https://github.com/informatyzacja/opticms/blob/main/automation/userscripts/opti_employee/opti_employee.js
+// @downloadURL https://raw.githubusercontent.com/informatyzacja/opticms/main/automation/userscripts/opti_employee/opti_employee.js
 // ==/UserScript==
 
 let config = {};
