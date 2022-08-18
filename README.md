@@ -5,11 +5,16 @@ Repozytorium ze wszystkimi instrukcjami obsługi optiCMS wraz z narzędziami do 
 ## Spis treści
 
 - [Automatyzacja](#automatyzacja)
+- [Usprawnienia](#usprawnienia)
 - [Instrukcje](#instrukcje)
 
 ## Automatyzacja
 
 - [Lista userscriptów](./automation/userscripts)
+
+## Usprawnienia
+
+- [fix: wyświetlanie aktualności](./improvements/fix-news-visibility)
 
 ## Instrukcje
 
