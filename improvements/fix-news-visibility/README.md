@@ -4,18 +4,18 @@ Poniższy kod służy do naprawienia niewyświetlających się aktualności na 
 
 ```html
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        let loadMoreNews = document.getElementById('loadMoreNews');
-        if (loadMoreNews !== null) {
-            loadMoreNews.click();
-        }
-    });
+  document.addEventListener("DOMContentLoaded", () => {
+    let loadMoreNews = document.getElementById('loadMoreNews');
+    if (loadMoreNews !== null) {
+      loadMoreNews.click();
+    }
+  });
 </script>
 ```
 
 ## Instrukcja instalacji
 
-Po zalogowaniu do panelu CMS strony należy wejść po kolei zaczynając od paska nawigacji: 
+Po zalogowaniu do panelu CMS strony należy wejść po kolei zaczynając od paska nawigacji:
 
 `Konfiguracja -> Ustawienia strony -> Ustawienia zaawansowane`.
 
