@@ -18,4 +18,4 @@ Repozytorium ze wszystkimi instrukcjami obsługi optiCMS wraz z narzędziami do 
 
 ## Instrukcje
 
-to be continued...
+- [Spis instrukcji](./instructions)
