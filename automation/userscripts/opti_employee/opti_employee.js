@@ -133,10 +133,10 @@ function wait(ms) {
 }
 
 function pressEnter(element) {
-  var ev = document.createEvent('Event');
-  ev.initEvent('keydown');
-  ev.which = ev.keyCode = 13;
-  element.dispatchEvent(ev);
+  let event = document.createEvent('Event');
+  event.initEvent('keydown');
+  event.which = event.keyCode = 13;
+  element.dispatchEvent(event);
 }
 
 function initToCheck() {
@@ -177,13 +177,13 @@ async function addMultipleClickedValues(toAdd) {
 }
 
 async function addMultipleClicked() {
-  let toAdd = prompt('json with people');
+  const toAdd = prompt('json with people');
 
   return await addMultipleClickedValues(toAdd);
 }
 
 async function ensureNoListView() {
-  let btn = await waitForSelector('span.elfinder-button-icon.elfinder-button-icon-view');
+  const btn = await waitForSelector('span.elfinder-button-icon.elfinder-button-icon-view');
 
   if (![...btn.classList].includes('elfinder-button-icon-view-list')) {
     console.log('[!!] switching away from list view');
@@ -196,7 +196,7 @@ async function ensureNoListView() {
 function clickThenDoubleclick(el) {
   el.click();
 
-  let doubleCliekEvent = document.createEvent('MouseEvents');
+  const doubleCliekEvent = document.createEvent('MouseEvents');
 
   doubleCliekEvent.initEvent('dblclick', true, true);
   el.dispatchEvent(doubleCliekEvent);
@@ -235,11 +235,11 @@ async function pageEmployeesSetImage(image) {
 
   console.log(`[!!] Window closed - waiting for the results view`);
 
-  let elfinder_cwd_view_icons = await waitForSelector('.elfinder-cwd-view-icons');
+  const elfinder_cwd_view_icons = await waitForSelector('.elfinder-cwd-view-icons');
 
   console.log(`[!!] Results view obtained (with ${[...elfinder_cwd_view_icons.children].length} children)`);
 
-  let file = [...elfinder_cwd_view_icons.children]
+  const file = [...elfinder_cwd_view_icons.children]
     .filter(c => ![...c.classList].includes('directory'))[0];
 
   if (file == null) {
@@ -261,7 +261,7 @@ async function pageEmployeesSetImage(image) {
 }
 
 function readableName(name) {
-  let names = {
+  const names = {
     firstname: "imię",
     lastname: "nazwisko",
     image: "zdjęcie",
@@ -338,7 +338,7 @@ async function pageEmployeesEdit() {
   let lastname = document.querySelector('#lastname.pwr-input').value;
 
   //console.log(`Searching for ${firstname} ${lastname} in `, state.toAdd);
-  var person = state.toAdd.filter(person => person.firstname == firstname
+  const person = state.toAdd.filter(person => person.firstname == firstname
     && person.lastname == lastname)[0];
 
   if (!person) {
@@ -356,7 +356,7 @@ async function pageEmployeesEdit() {
     return;
   }
 
-  let oldImage = (document.querySelector('input[name="photos[0][name]"') || {}).value;
+  const oldImage = (document.querySelector('input[name="photos[0][name]"') || {}).value;
 
   if (oldImage && oldImage != person.image) {
     // THIS IS A BIG HACK
@@ -530,8 +530,10 @@ async function pageEmployeesIndexSetOrder() {
 
   let getId = (first, last) => (namesToId.filter(({ id, lastname, firstname }) => lastname == last && firstname == first)[0]).id;
 
+  let order;
+
   try {
-    var order = state.order
+    order = state.order
       .map(({ firstname, lastname }) => getId(firstname, lastname))
       .map(id => `#${id}`)
       .join('');
@@ -632,7 +634,7 @@ async function greasePageFullyLoaded() {
   if (document.location.hash.startsWith("#opticms-automation=")) {
     state = new State('{}');
 
-    var decoded_toAdd_string = decodeURIComponent(document.location.hash.replace(/^#opticms-automation=/, ''));
+    const decoded_toAdd_string = decodeURIComponent(document.location.hash.replace(/^#opticms-automation=/, ''));
 
     console.log('[!!] loading state from URL hash:', decoded_toAdd_string);
 
@@ -645,7 +647,7 @@ async function greasePageFullyLoaded() {
     state = new State(await getValue('grease-opticms-state', '{}'));
   }
 
-  var hasSeqQuery = document.location.search.substring(1).split('&').includes('seq');
+  const hasSeqQuery = document.location.search.substring(1).split('&').includes('seq');
 
   if (document.location.pathname.startsWith('/panel/employers/')) {
     let [_0, _1, _2, pageName, stringPageId, pageId] =
