@@ -7,7 +7,7 @@ Poniżej znajduje się spis instrukcji z obsługi optiCMS.
 # Dodawanie stron
 ## Treść
 Aby utworzyć stronę należy znaleźć w menu po lewej stronie folder do którego ma należeć tworzona strona, kliknąć na niego prawym przyciskiem myszy i wybrać "dodaj podstronę"
-![](.images/tworzenie-strony1.jpg)
+![](.images/tworzenie-strony1.png)
 
 - Nazwa długa - nazwa wyświetlająca się na górze strony po wejściu na nią
 - Nazwa krótka - nazwa wyświetlająca się w menu nad stroną
