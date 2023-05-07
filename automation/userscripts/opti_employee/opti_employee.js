@@ -3,7 +3,7 @@
 // @namespace   Komisja ds. Informatyzacji
 // @description OptiCMS employee list automation
 // @author      Komisja ds. Informatyzacji
-// @version     0.0.9
+// @version     0.1.0
 // @match       https://samorzad.pwr.edu.pl/panel/employers/*
 // @run-at      document-start
 // @grant       GM.getValue
@@ -18,6 +18,7 @@ let config = {};
 async function getValue(name, def) {
   return await GM.getValue(name, def);
 }
+
 async function setValue(name, val) {
   return await GM.setValue(name, val);
 }
@@ -38,17 +39,15 @@ class State {
   }
 
   workingOn() {
-    return this.toCheck.length > 0
-      ? 'checking'
-      : this.toAdd.length > 0
-      ? 'adding'
-      : this.toDelete.length > 0
-      ? 'deleting'
-      : this.order.length > 0
-      ? 'setting-order'
-      : this.log.length > 0
-      ? 'displaying-log'
-      : 'idle';
+    const { toCheck, toAdd, toDelete, order, log } = this;
+
+    if (toCheck.length > 0) return 'checking';
+    if (toAdd.length > 0) return 'adding';
+    if (toDelete.length > 0) return 'deleting';
+    if (order.length > 0) return 'setting-order';
+    if (log.length > 0) return 'displaying-log';
+
+    return 'idle';
   }
 
   async save() {
@@ -75,20 +74,23 @@ function escapeHtml(unsafe) {
 }
 
 async function displayLog() {
-  let d = document.createElement('div');
+  const d = document.createElement('div');
+  const { log } = state;
 
-  d.classList = 'module-body corner-all';
-  d.style = 'margin-top: 1em; margin-bottom: 1em';
+  d.className = 'module-body corner-all';
+  d.style.marginTop = '1em';
+  d.style.marginBottom = '1em';
   d.innerHTML = `
-        <div class="module-content">
-            <h3 class="grid-header">Raport: zmiany wprowadzone przez skrypt</h3>
-            ${state.log
-              .map(escapeHtml)
-              .map((text) => `<li>${text}</li>`)
-              .join('\n')}
-        </div>`;
+    <div class="module-content">
+      <h3 class="grid-header">Raport: zmiany wprowadzone przez skrypt</h3>
+      ${log
+        .map(escapeHtml)
+        .map((text) => `<li>${text}</li>`)
+        .join('\n')}
+    </div>
+  `;
 
-  let container = document.querySelector(
+  const container = document.querySelector(
     '#dashboard > .wrap-fluid > .container-fluid',
   );
 
@@ -98,31 +100,35 @@ async function displayLog() {
   await state.save();
 }
 
-function waitForSelector(sel) {
+async function waitForSelector(selector) {
+  let element = document.querySelector(selector);
+
+  if (element) {
+    return element;
+  }
+
   return new Promise((resolve, reject) => {
-    let firstTryEl = document.querySelector(sel);
+    let observer = new MutationObserver((mutations) => {
+      let element = document.querySelector(selector);
 
-    if (firstTryEl != null) {
-      resolve(firstTryEl);
-      return;
-    }
-
-    let intervalId = setInterval(function () {
-      let el = document.querySelector(sel);
-
-      if (el != null) {
-        resolve(el);
-        clearInterval(intervalId);
+      if (element) {
+        observer.disconnect();
+        resolve(element);
       }
-    }, 75);
+    });
+
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+    });
   });
 }
 
-function waitNotNull(something) {
+function waitForTruthyValue(something) {
   return new Promise((resolve, reject) => {
     let firstTry = something();
 
-    if (firstTry != null) {
+    if (firstTry) {
       resolve(firstTry);
       return;
     }
@@ -130,7 +136,7 @@ function waitNotNull(something) {
     let intervalId = setInterval(function () {
       let res = something();
 
-      if (res != null) {
+      if (res) {
         resolve(res);
         clearInterval(intervalId);
       }
@@ -145,20 +151,16 @@ function wait(ms) {
 }
 
 function pressEnter(element) {
-  let event = document.createEvent('Event');
-  event.initEvent('keydown');
-  event.which = event.keyCode = 13;
-  element.dispatchEvent(event);
+  element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
 }
 
 function initToCheck() {
   return [
     ...new Set(
-      [
-        ...document.querySelectorAll(
-          'a[href^="/panel/employers/edit/page_id/"]',
-        ),
-      ].map((el) => el.href),
+      Array.from(
+        document.querySelectorAll('a[href^="/panel/employers/edit/page_id/"]'),
+        (el) => el.href,
+      ),
     ),
   ];
 }
@@ -185,17 +187,25 @@ async function addMultipleClickedValues(toAdd) {
 
   addOverlay();
 
+  // const employerLinks = Array.from(
+  //   document.querySelectorAll('a[href^="/panel/employers/edit/page_id/"]'),
+  // ).map((el) => el.href);
+
+  // const uniqueEmployerLinks = [...new Set(employerLinks)];
+
   state.toAdd = arr;
   state.setToCheck = true;
-  //state.toCheck = [...new Set([...document.querySelectorAll('a[href^="/panel/employers/edit/page_id/"]')].map(el=>el.href))];
+  // state.toCheck = uniqueEmployerLinks;
   state.toDelete = [];
 
   await state.save();
 
   // reset search first
-  document
-    .querySelector('.module-content input.grid-reset[type=button]')
-    .click(); // redirects
+  const resetButton = document.querySelector(
+    '.module-content input.grid-reset[type=button]',
+  );
+  resetButton.click(); // redirects
+
   //nextPageInFlow();
   //document.location = `/panel/employers/add/page_id/${config.pageId}/?seq`;
 }
@@ -211,7 +221,7 @@ async function ensureNoListView() {
     'span.elfinder-button-icon.elfinder-button-icon-view',
   );
 
-  if (![...btn.classList].includes('elfinder-button-icon-view-list')) {
+  if (!btn.classList.contains('elfinder-button-icon-view-list')) {
     console.log('[!!] switching away from list view');
     btn.click();
 
@@ -219,17 +229,21 @@ async function ensureNoListView() {
   }
 }
 
-function clickThenDoubleclick(el) {
+function clickThenDoubleClick(el) {
   el.click();
 
-  const doubleCliekEvent = document.createEvent('MouseEvents');
+  const doubleClickEvent = new MouseEvent('dblclick', {
+    bubbles: true,
+    cancelable: true,
+    view: window,
+  });
 
-  doubleCliekEvent.initEvent('dblclick', true, true);
-  el.dispatchEvent(doubleCliekEvent);
+  el.dispatchEvent(doubleClickEvent);
 }
 
 async function pageEmployeesSetImage(image) {
-  document.querySelector('#photos_open').click();
+  const photosOpenButton = document.querySelector('#photos_open');
+  photosOpenButton.click();
 
   // wait for file manager to open
   await waitForSelector('#filemanagerphotos_open .elfinder-navbar-wrapper');
@@ -239,15 +253,15 @@ async function pageEmployeesSetImage(image) {
 
   await ensureNoListView();
 
-  let searchBar = document.querySelector(
-    '.elfinder-button-search input[type=text]',
+  const searchBar = document.querySelector(
+    '.elfinder-button-search input[type="text"]',
+  );
+  const searchButton = document.querySelector(
+    '.elfinder-button-search .ui-icon-search',
   );
 
   searchBar.value = image;
-  // For some weird reason the return key doesn't register in some situations - predominately on firefox on macos
-  //pressEnter(searchBar);
-  // try clicking the small looking glass icon instead
-  document.querySelector('.elfinder-button-search .ui-icon-search').click();
+  searchButton.click();
 
   const statusWindowSelector =
     '.elfinder-dialog-icon.elfinder-dialog-icon-search';
@@ -264,27 +278,28 @@ async function pageEmployeesSetImage(image) {
     `[!!] Searched for '${image}' - waiting for the "Searching..." window to close`,
   );
 
-  await waitNotNull(() =>
-    document.querySelector(statusWindowSelector) ? null : true,
-  );
+  const waitForElementToDisappear = () =>
+    document.querySelector(statusWindowSelector) ? null : true;
+
+  await waitForTruthyValue(waitForElementToDisappear);
 
   console.log(`[!!] Window closed - waiting for the results view`);
 
-  const elfinder_cwd_view_icons = await waitForSelector(
+  const elfinderCwdViewIcons = await waitForSelector(
     '.elfinder-cwd-view-icons',
   );
 
   console.log(
     `[!!] Results view obtained (with ${
-      [...elfinder_cwd_view_icons.children].length
+      [...elfinderCwdViewIcons.children].length
     } children)`,
   );
 
-  const file = [...elfinder_cwd_view_icons.children].filter(
-    (c) => ![...c.classList].includes('directory'),
-  )[0];
+  const files = elfinderCwdViewIcons.querySelectorAll(
+    'div.element:not(.directory)',
+  );
 
-  if (file == null) {
+  if (files.length === 0) {
     console.warn(`[!!] Could not find any file with name '${image}'`);
     alert(`Nie znaleziono zdjecia '${image}'!`);
     return;
@@ -292,7 +307,7 @@ async function pageEmployeesSetImage(image) {
 
   console.log(`[!!] Found a file for ${image} - double clicking`);
 
-  clickThenDoubleclick(file);
+  clickThenDoubleClick(files[0]);
 
   // Wait for the photo to show up
   console.log(`[!!] Waiting for the photo to show up`);
@@ -319,55 +334,61 @@ function readableName(name) {
 }
 
 async function checkPublishedApproved(firstname, lastname) {
-  let somethingChanged = false;
+  const changes = [];
 
-  let approved = document.querySelector('input#approved[type=checkbox]');
-
-  if (approved && !approved.checked) {
-    somethingChanged = true;
-    await log(`Dla ${firstname} ${lastname} zaznaczono "Zatwierdzone"`);
-    approved.checked = true;
+  const approvedCheckbox = document.querySelector(
+    'input#approved[type=checkbox]',
+  );
+  if (approvedCheckbox && !approvedCheckbox.checked) {
+    approvedCheckbox.checked = true;
+    changes.push(`Zatwierdzone dla ${firstname} ${lastname}`);
   }
 
-  let published = document.querySelector('input#published[type=checkbox]');
-
-  if (published && !published.checked) {
-    somethingChanged = true;
-    await log(`Dla ${firstname} ${lastname} zaznaczono "Opublikowane"`);
-    published.checked = true;
+  const publishedCheckbox = document.querySelector(
+    'input#published[type=checkbox]',
+  );
+  if (publishedCheckbox && !publishedCheckbox.checked) {
+    publishedCheckbox.checked = true;
+    changes.push(`Opublikowane dla ${firstname} ${lastname}`);
   }
 
-  return somethingChanged;
+  if (changes.length > 0) {
+    await log(changes.join(', '));
+    return true;
+  } else {
+    return false;
+  }
 }
 
 async function pageEmployeesAdd() {
-  let person = state.toAdd.pop();
+  const person = state.toAdd.pop();
+  const inputs = Array.from(
+    document.querySelectorAll('textarea.pwr-textarea, input.pwr-input'),
+  );
 
   await log(`Dodano ${person.firstname} ${person.lastname}`);
 
-  let inputs = document.querySelectorAll(
-    'textarea.pwr-textarea, input.pwr-input',
-  );
+  for (const input of inputs) {
+    const { id } = input;
+    input.value = person[id] || '';
 
-  for (let input of inputs) {
-    input.value = person[input.id] || '';
-
-    if (input.value && input.id != 'firstname' && input.id != 'lastname')
+    if (input.value && !['firstname', 'lastname'].includes(id)) {
       await log(
         `Dla ${person.firstname} ${person.lastname} ustawiono ${readableName(
-          input.id,
-        )} o wartości "${input.value}"`,
+          id,
+        )} o wartości "${value}"`,
       );
+    }
   }
 
   await checkPublishedApproved(person.firstname, person.lastname);
-
   await pageEmployeesSetImage(person.image);
+
+  await state.save();
+
   await log(
     `Dla ${person.firstname} ${person.lastname} ustawiono zdjęcie "${person.image}"`,
   );
-
-  await state.save();
 
   document.querySelector('input.pwr-btn-submit').click();
 }
@@ -540,7 +561,7 @@ function tryParseJsonArray(json, defaultValue) {
 }
 
 function goToNextToCheck() {
-  let newLocation = state.toCheck[state.toCheck.length - 1];
+  const newLocation = state.toCheck[state.toCheck.length - 1];
 
   document.location = `${newLocation}?seq`;
 }
