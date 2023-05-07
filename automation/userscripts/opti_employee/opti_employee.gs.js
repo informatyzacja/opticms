@@ -1,45 +1,125 @@
-function firstFunction() { console.log(main()); }
+function firstFunction() {
+  console.log(main());
+}
+
+function getRows(data) {
+  const [names, ...rows] = data;
+
+  return rows.map((row) =>
+    Object.fromEntries(row.map((value, i) => [names[i], value])),
+  );
+}
+
+function fixMissingDepartments(rows) {
+  let lastDepartment = null;
+
+  for (const row of rows) {
+    if (row['Wydział'] == '') row['Wydział'] = lastDepartment;
+
+    lastDepartment = row['Wydział'];
+  }
+}
+
+function remapRow(row) {
+  const res = {
+    firstname: '',
+    lastname: '',
+    image: '',
+    description: '',
+    linkedin_link: '',
+    fb_link: '',
+    url: '',
+    email: '',
+    phone: '',
+  };
+
+  for (const [name, value] of Object.entries(row)) {
+    const trimmedValue = `${value}`.trim();
+
+    switch (name) {
+      case 'Imię':
+        res.firstname = trimmedValue;
+        break;
+      case 'Nazwisko':
+        res.lastname = trimmedValue;
+        break;
+      case 'Nr telefonu':
+        res.phone = trimmedValue;
+        break;
+      case 'Adres e-mail':
+        res.email = trimmedValue;
+        break;
+      case 'Funkcja':
+        res.description = trimmedValue;
+        break;
+      case 'Nazwa zdjęcia na stronę':
+        if (trimmedValue !== '') {
+          res.image = trimmedValue;
+        }
+        break;
+      case 'Wydział':
+        if (res.image === '') {
+          res.image = imageFromDepartment(trimmedValue);
+        }
+        break;
+      case 'Czy powinien bć na stronie':
+        if (trimmedValue === 'Nie') {
+          return null;
+        }
+        break;
+      default:
+        console.error('Unknown column', name, ':', trimmedValue);
+    }
+  }
+
+  return res;
+}
+
+function showJson(json) {
+  const html = `<!doctype html><html><body><pre>${JSON.stringify(
+    json,
+    null,
+    4,
+  ).replace(/</g, '&lt;')}</pre></body></html>`;
+
+  const htmlOutput = HtmlService.createHtmlOutput(html);
+
+  SpreadsheetApp.getUi().showModelessDialog(
+    htmlOutput,
+    'Aktualizacja Opticmsa',
+  );
+}
 
 /**
  * Open a URL in a new tab. - https://stackoverflow.com/a/47098533
  */
 function showAnchor(name, url) {
-  const html = `<html><body><a href="${url}" target="blank" onclick="google.script.host.close()">${name}</a></body></html>`;
-  const ui = HtmlService.createHtmlOutput(html);
+  const html = `<html><body><a href="${url}" target="_blank" onclick="google.script.host.close()">${name}</a></body></html>`;
+  const htmlOutput = HtmlService.createHtmlOutput(html);
 
-  SpreadsheetApp.getUi().showModelessDialog(ui, 'Aktualizacja Opticmsa');
+  SpreadsheetApp.getUi().showModelessDialog(
+    htmlOutput,
+    'Aktualizacja Opticmsa',
+  );
 }
-//function b64_to_utf8( str ) {
-//  return decodeURIComponent(escape(atob( str )));
-//}
 
 // https://stackoverflow.com/a/69015165/3105260
 function openUrl(url) {
-  Logger.log(`openUrl. url: ${url}`);
+  const html = `
+    <html>
+      <a id='url' href="${url}" target="_blank">Click here</a>
+      <script>
+        var winRef = window.open("${url}");
+        winRef ? google.script.host.close() : window.alert('Zezwól na otwieranie popup-ów przez tą witrynę w przeglądarce');
+      </script>
+    </html>`;
 
-  const html = `<html>
-<a id='url' href="${url}">Click here</a>
-  <script>
-     var winRef = window.open("${url}");
-     winRef ? google.script.host.close() : window.alert('Zezwól na otwieranie popup-ów przez tą witrynę w przeglądarce') ;
-     </script>
-</html>`;
-
-  Logger.log(`openUrl. html: ${html}`);
-
-  const htmlOutput = HtmlService.createHtmlOutput(html).setWidth(250).setHeight(300);
-
-  Logger.log(`openUrl. htmlOutput: ${htmlOutput}`);
+  const htmlOutput = HtmlService.createHtmlOutput(html)
+    .setWidth(250)
+    .setHeight(300);
 
   SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Aktualizacja Opticmsa');
   // https://developers.google.com/apps-script/reference/base/ui#showModalDialog(Object,String)  Requires authorization with this scope: https://www.googleapis.com/auth/script.container.ui  See https://developers.google.com/apps-script/concepts/scopes#setting_explicit_scopes
-}
-
-function showJson(json) {
-  const html = '<!doctype html><html><body><pre>' + JSON.stringify(json, null, 4).replace(/</g, '&lt;') + '</pre></body></html>';
-  const ui = HtmlService.createHtmlOutput(html);
-
-  SpreadsheetApp.getUi().showModelessDialog(ui, 'Aktualizacja Opticmsa');
 }
 
 function onOpen() {
@@ -56,7 +136,6 @@ function menuItemUpdate() {
   const data = main();
 
   if (data.startsWith('https://')) {
-    //showAnchor('aktualizuj', data);
     openUrl(data);
   } else {
     SpreadsheetApp.getUi().alert(data);
@@ -65,23 +144,6 @@ function menuItemUpdate() {
 
 function menuItemShow() {
   main(true);
-}
-
-function getRows(data) {
-  const names = data[0];
-
-  const rows = data.splice(1).map(row => {
-    let objRow = {};
-
-    row.forEach((value, i) => {
-      const name = names[i];
-      objRow[name] = value;
-    });
-
-    return objRow;
-  });
-
-  return rows;
 }
 
 /*
@@ -148,70 +210,19 @@ function imageFromDepartment(department) {
   }
 }
 
-function remapRow(row) {
-  let res = {
-    'firstname': '',
-    'lastname': '',
-    'image': '',
-    'description': '',
-    'linkedin_link': '',
-    'fb_link': '',
-    'url': '',
-    'email': '',
-    'phone': ''
-  };
-
-  for (const name in row) {
-    const value = `${row[name]}`.trim();
-
-    if (name == 'Imię') res.firstname = value;
-    else if (name == 'Nazwisko') res.lastname = value;
-    else if (name == 'Nr telefonu') res.phone = value;
-    else if (name == 'Adres e-mail') res.email = value;
-    else if (name == 'Funkcja') res.description = value;
-    else if (name == 'Nazwa zdjęcia na stronę') {
-      if (value != '') res.image = value;
-    } else if (name == 'Wydział') {
-      if (res.image == '') res.image = imageFromDepartment(value);
-    } else if (name == 'Lp.' || name == 'Lp') { }
-    else if (name == 'Nr indeksu') { }
-    else if (name == 'Czy powinien być na stronie' && value == 'Tak') { }
-    else if (name == 'Czy powinien być na stronie' && value == 'Nie') { return null; }
-    else if (name == 'Komisja Parlamentarna' || name == 'Telefon' || name == 'Prawo głosu') { }
-    else {
-      console.error('Unknown column', name, ':', value);
-    }
-  }
-
-  return res;
-}
-
-function fixMissingDepartments(rows) {
-  let lastDepartment = null;
-
-  rows.forEach((value, index) => {
-    if (value['Wydział'] == '')
-      value['Wydział'] = lastDepartment;
-
-    lastDepartment = value['Wydział'];
-  });
-}
-
 function main(showPrettyJson) {
   const spreadsheet = SpreadsheetApp.getActiveSheet();
-  let values = spreadsheet.getDataRange().getValues();
+  const values = spreadsheet.getDataRange().getValues();
 
   let url = null;
 
-  if (values[0][0].toLowerCase() == 'url') {
+  if (values[0][0].toLowerCase() === 'url') {
     url = values[0][1];
 
     console.log('[!] URL found:', url);
-
-    values = values.splice(1);
   }
 
-  const rows = getRows(values);
+  const rows = getRows(values.slice(url !== null ? 1 : 0));
 
   console.log(rows);
 
@@ -219,9 +230,19 @@ function main(showPrettyJson) {
 
   fixMissingDepartments(rows);
 
-  const mappedRows = rows.map(remapRow)
-    .filter(row => row != null)
-    .filter(row => row.firstname != '' && row.lastname != '');
+  const mappedRows = [];
+
+  for (const row of rows) {
+    const mappedRow = remapRow(row);
+
+    if (
+      mappedRow !== null &&
+      mappedRow.firstname !== '' &&
+      mappedRow.lastname !== ''
+    ) {
+      mappedRows.push(mappedRow);
+    }
+  }
 
   if (showPrettyJson) {
     showJson(mappedRows);
@@ -230,7 +251,9 @@ function main(showPrettyJson) {
   }
 
   if (url !== null) {
-    return `${url}#opticms-automation=${encodeURIComponent(JSON.stringify(mappedRows))}`;
+    return `${url}#opticms-automation=${encodeURIComponent(
+      JSON.stringify(mappedRows),
+    )}`;
   } else {
     return JSON.stringify(mappedRows, null, 4);
   }
