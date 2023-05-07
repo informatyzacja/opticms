@@ -107,15 +107,45 @@ function imageFromDepartment(department) {
 
   department = department.toLowerCase();
 
-  if (department == 'rfss1') department = 'w14';
-  if (department == 'rfss2') department = 'w15';
-  if (department == 'rfss3') department = 'w16';
-
-  if (['w4', 'w8'].includes(department)) {
-    department += 'n';
+  switch (department) {
+    case 'w1':
+      return 'w1_nowe.jpg';
+    case 'w2':
+      return 'miniatura-w2.png';
+    case 'w3':
+      return 'miniatura-w3.png';
+    case 'w4':
+    case 'w4n':
+      return 'miniatura-w4n.png';
+    case 'w5':
+      return 'miniatura-w5.png';
+    case 'w6':
+      return 'miniatura-w6.png';
+    case 'w7':
+      return 'miniatura-w7.png';
+    case 'w8':
+    case 'w8n':
+      return 'miniatura-w8n.png';
+    case 'w9':
+      return 'miniatura-w9.png';
+    case 'w10':
+      return 'miniatura-w10.png';
+    case 'w11':
+      return 'miniatura-w11.png';
+    case 'w12':
+    case 'w12n':
+      return 'miniatura-w12.png';
+    case 'w13':
+      return 'miniatura-w13.png';
+    case 'rfss1':
+      return 'miniatura-w14.png';
+    case 'rfss2':
+      return 'miniatura-w15.png';
+    case 'rfss3':
+      return 'miniatura-w16.png';
+    default:
+      return 'miniatura-w16.png'; // on error xd
   }
-
-  return `miniatura-${department}.png`;
 }
 
 function remapRow(row) {
