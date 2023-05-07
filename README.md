@@ -14,7 +14,7 @@ Repozytorium ze wszystkimi instrukcjami obsługi optiCMS wraz z narzędziami do 
 
 ## Usprawnienia
 
-- [fix: wyświetlanie aktualności](./improvements/fix-news-visibility)
+- [Lista usprawnień](./improvements)
 
 ## Instrukcje
 
