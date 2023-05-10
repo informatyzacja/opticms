@@ -3,7 +3,7 @@
 // @namespace   Komisja ds. Informatyzacji
 // @description OptiCMS employee list automation
 // @author      Komisja ds. Informatyzacji
-// @version     0.1.0
+// @version     0.1.1
 // @match       https://samorzad.pwr.edu.pl/panel/employers/*
 // @run-at      document-start
 // @grant       GM.getValue
@@ -376,7 +376,7 @@ async function pageEmployeesAdd() {
       await log(
         `Dla ${person.firstname} ${person.lastname} ustawiono ${readableName(
           id,
-        )} o wartości "${value}"`,
+        )} o wartości "${input.value}"`,
       );
     }
   }
