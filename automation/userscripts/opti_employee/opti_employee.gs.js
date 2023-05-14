@@ -62,7 +62,7 @@ function remapRow(row) {
           res.image = imageFromDepartment(trimmedValue);
         }
         break;
-      case 'Czy powinien bć na stronie':
+      case 'Czy powinien być na stronie':
         if (trimmedValue === 'Nie') {
           return null;
         }
